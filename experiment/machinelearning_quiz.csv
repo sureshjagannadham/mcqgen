@@ -1,4 +1,4 @@
 MCQ,Choices,Correct
-What type of machine learning uses labeled data to make predictions or classifications?,a: Unsupervised Learning | b: Reinforcement Learning | c: Supervised Learning | d: Self-Supervised Learning,c
-Which type of machine learning finds patterns in unlabeled data?,a: Supervised Learning | b: Semi-Supervised Learning | c: Reinforcement Learning | d: Unsupervised Learning,d
-What does semi-supervised learning combine?,a: Only labeled data | b: Only unlabeled data | c: A small amount of labeled data with a large amount of unlabeled data | d: Labeled data with self-generated labels,c
+What type of machine learning trains models on labeled data to predict or classify new data?,a: Unsupervised Learning | b: Reinforcement Learning | c: Supervised Learning | d: Self-Supervised Learning,c
+Which type of learning finds patterns in unlabeled data?,a: Supervised Learning | b: Semi-Supervised Learning | c: Unsupervised Learning | d: Reinforcement Learning,c
+What is the key feature of Self-Supervised Learning?,a: It requires extensive manual labeling | b: It generates its own labels from the data | c: It uses only labeled data | d: It is identical to supervised learning,b
