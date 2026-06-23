@@ -83,7 +83,17 @@ with st.form("user_inputs"):
                             
                             # Render the clean question matrix table grid interface
                             st.table(df)
-                            
+
+                            # Convert DataFrame to CSV
+                            csv = df.to_csv(index=False).encode('utf-8')
+
+                            # Add a download button
+                            st.download_button(
+                                label="Download MCQs as CSV",
+                                data=csv,
+                                file_name="machinelearning_quiz.csv",
+                                mime="text/csv"
+                            ) 
                             # Display the review text safely in a text area box element
                             st.text_area(label="Review", value=response.get("review", ""))
                         else:
