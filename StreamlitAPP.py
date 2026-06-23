@@ -37,73 +37,71 @@ with st.form("user_inputs"):
     
     # Add Button
     button = st.form_submit_button("Create MCQs")
-    # Check if the button is clicked and all fields have input
-    if button and uploaded_file is not None and mcq_count and subject and tone:
-        with st.spinner("loading..."):
-            try:
-                text = read_file(uploaded_file)
-                
-                # Count tokens and the cost of API call
-                with get_openai_callback() as cb:
-                    # Fixed: Added .invoke() for modern LangChain compliance
-                     response = generate_evaluate_chain.invoke({
-                        "text": text,
-                        "number": mcq_count,
-                        "subject": subject,
-                        "tone": tone,
-                        "response_json": json.dumps(RESPONSE_JSON)
-                    })
-                    
-                # Print token usage costs to your terminal logs
-                print(cb)
-                
-            except Exception as e:
-                traceback.print_exception(type(e), e, e.__traceback__)
-                st.error("Error")
+
+# FIXED: Removed indentation here to place this block OUTSIDE the st.form block
+if button and uploaded_file is not None and mcq_count and subject and tone:
+    with st.spinner("loading..."):
+        try:
+            text = read_file(uploaded_file)
             
-            else: 
-                # 1. Print token usage statistics to your terminal console logs
-                print(f"Total Tokens: {cb.total_tokens}")
-                print(f"Prompt Tokens: {cb.prompt_tokens}")
-                print(f"Completion Tokens: {cb.completion_tokens}")
-                print(f"Total Cost: {cb.total_cost}")
+            # Count tokens and the cost of API call
+            with get_openai_callback() as cb:
+                # Fixed: Added .invoke() for modern LangChain compliance
+                 response = generate_evaluate_chain.invoke({
+                    "text": text,
+                    "number": mcq_count,
+                    "subject": subject,
+                    "tone": tone,
+                    "response_json": json.dumps(RESPONSE_JSON)
+                })
                 
-                # 2. Safely parse and process the LangChain response object
-                if isinstance(response, dict):
-                    # Extract the quiz data from the response dictionary
-                    quiz = response.get("quiz", None)
+            # Print token usage costs to your terminal logs
+            print(cb)
+            
+        except Exception as e:
+            traceback.print_exception(type(e), e, e.__traceback__)
+            st.error("Error")
+        
+        else: 
+            # 1. Print token usage statistics to your terminal console logs
+            print(f"Total Tokens: {cb.total_tokens}")
+            print(f"Prompt Tokens: {cb.prompt_tokens}")
+            print(f"Completion Tokens: {cb.completion_tokens}")
+            print(f"Total Cost: {cb.total_cost}")
+            
+            # 2. Safely parse and process the LangChain response object
+            if isinstance(response, dict):
+                # Extract the quiz data from the response dictionary
+                quiz = response.get("quiz", None)
+                
+                if quiz is not None:
+                    table_data = get_table_data(quiz)
                     
-                    if quiz is not None:
-                        table_data = get_table_data(quiz)
+                    # FIXED: Changed from 'is not None' to handle 'False' safely
+                    if table_data:
+                        df = pd.DataFrame(table_data)
+                        df.index = df.index + 1
                         
-                        # FIXED: Changed from 'is not None' to handle 'False' safely
-                        if table_data:
-                            df = pd.DataFrame(table_data)
-                            df.index = df.index + 1
-                            
-                            # Render the clean question matrix table grid interface
-                            st.table(df)
+                        # Render the clean question matrix table grid interface
+                        st.table(df)
 
-                            # Convert DataFrame to CSV
-                            csv = df.to_csv(index=False).encode('utf-8')
+                        # Convert DataFrame to CSV
+                        csv = df.to_csv(index=False).encode('utf-8')
 
-                            # Add a download button
-                            st.download_button(
-                                label="Download MCQs as CSV",
-                                data=csv,
-                                file_name="machinelearning_quiz.csv",
-                                mime="text/csv"
-                            ) 
-                            # Display the review text safely in a text area box element
-                            st.text_area(label="Review", value=response.get("review", ""))
-                        else:
-                            st.error("Error in the table data")
+                        # Add a download button
+                        st.download_button(
+                            label="Download MCQs as CSV",
+                            data=csv,
+                            file_name="machinelearning_quiz.csv",
+                            mime="text/csv"
+                        ) 
+                        # Display the review text safely in a text area box element
+                        st.text_area(label="Review", value=response.get("review", ""))
                     else:
-                        st.error("Error: Quiz generation component missing from response.")
-                        
+                        st.error("Error in the table data")
                 else:
-                    # Fallback if response is unexpectedly a raw string rather than a dictionary
-                    st.write(response)
-
-
-                        
+                    st.error("Error: Quiz generation component missing from response.")
+                    
+            else:
+                # Fallback if response is unexpectedly a raw string rather than a dictionary
+                st.write(response)
