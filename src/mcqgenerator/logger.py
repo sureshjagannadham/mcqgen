@@ -25,7 +25,7 @@ LOG_FILEPATH = os.path.join(log_path, LOG_FILE)
 logging.basicConfig(
     level=logging.INFO,          # Log INFO and above (INFO, WARNING, ERROR, CRITICAL)
     filename=LOG_FILEPATH,       # Save logs into the file created above
-    format="[% (asctime)s] %(lineno)d %(name)s - %(levelname)s - %(message)s"
+    format="[%(asctime)s] %(lineno)d %(name)s - %(levelname)s - %(message)s"
     # Format explanation:
     # %(asctime)s  → timestamp of log
     # %(lineno)d   → line number in code where log was triggered
